@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load static %}
+<body>
+{% block body %}
+    <div class="billmain">
+        <h3 align="center" class="mt-5">
+            <span class="badge badge-pill billpill mt-0">Monthly Bill</span>
+        </h3>
+        <div class="billdiv mt-5">
+            <div class="form-group">
+                <div class="col-xs-4 centerlabel">
+                    <label for="emailname" class="mt-4"> Enter email or Mess No.</label>
+                    <input class="form-control awesomplete centerinput  mt-2" id="emailname" name="emailname"
+                           type="text" placeholder="Enter Mess no or Name">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-4 centerlabel">
+                    <label for="monthname">Choose the month</label>
+                    <br>
+                    <select class="centerinput form-control  monthselect" id="monthselect">
+                        {% for m in months %}
+                            <option>{{ m }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <center>
+                <button id="bilbutton" data-remodal-target="newbillmodal"
+                        class="btn btn-lg btn-primary text-white mt-3">Generate Bill
+                </button>
+            </center>
+        </div>
+    </div>
+    <div class="remodal" data-remodal-id="newbillmodal">
+        <button data-remodal-action="close" class="remodal-close text-danger"></button>
+        <h3 align="center" class="menudaydiv">
+            <span class="badge badge-pill badge-info mt-0 menudayname"> Monthly Bill</span>
+        </h3>
+        <div class="col-xs-1 mt-5">
+            <div>
+                <label class="absent_title">Absent: </label>
+                <label id="absentlabel" class="ml-3 absent_value"> </label>
+            </div>
+            <div>
+                <label class="absent_title">Bill : </label>
+                <label id="billlabel" class="ml-3 absent_value"> </label>
+            </div>
+            <div class="price_button_div">
+                <button data-remodal-action="cancel" class="btn btn-outline-danger">Close</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        let arr = new Array();
+        let newarr = new Array();
+        {% for student in students %}
+            arr.push("{{ student.first_name }}" + " " + "{{ student.last_name }}");
+        {% endfor %}
+        getmapping();
+
+        function getmapping() {
+            let xmlhttp;
+            if (window.XMLHttpRequest) {
+                xmlhttp = new XMLHttpRequest();
+            } else {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.open('GET', '/get-email-user-mapping/', true);
+            xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xmlhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    let mydata = JSON.parse(this.response);
+                    newarr = mydata;
+                }
+            };
+            xmlhttp.send();
+        }
+
+        var input = document.getElementById("emailname");
+        new Awesomplete(input, {
+            list: arr
+        });
+        $(document).ready(function () {
+            $('.monthselect').select2();
+            $("#bilbutton").click(function () {
+                if ($('#emailname').val() == "" || $('#emailname').val() == null) {
+                    $('#bilbutton').removeAttr("data-remodal-target");
+                    var toast = new iqwerty.toast.Toast();
+                    toast.setText('Please enter mess no or name')
+                        .stylize({
+                            background: '#F1948A',
+                            color: 'black',
+                            'box-shadow': '0 0 50px rgba(0, 0, 0, .7)'
+                        })
+                        .show();
+                } else {
+                    getbill();
+                }
+
+            });
+        });
+
+        function getbill() {
+            $('#bilbutton').attr("data-remodal-target", "newbillmodal");
+            let useremail;
+            let sdata = $('#emailname').val();
+            var isnum = /^\d+$/.test(sdata);
+            if (isnum) {
+                sdata.trim();
+                useremail = sdata;
+            } else {
+                let mn = new Array();
+                let myans = {};
+                for (var i = 0; i < newarr.length; i++) {
+                    mn.push(newarr[i].name);
+                    myans[newarr[i].name] = newarr[i].email;
+                }
+                let check = mn.includes(sdata);
+                if (check) {
+                    useremail = myans[sdata];
+                }
+            }
+            let month = $('#monthselect').val();
+            let xmlhttp;
+            if (window.XMLHttpRequest) {
+                xmlhttp = new XMLHttpRequest();
+            } else {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.open('POST', '/get-bill/', true);
+            xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xmlhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    let ans = JSON.parse(this.response);
+                    $('#absentlabel').text(ans["absent"]);
+                    $('#billlabel').html("&#8377;&nbsp;&nbsp" + ans["bill"]);
+                }
+            };
+            xmlhttp.send("email=" + useremail + "&month=" + month);
+
+        }
+    </script>
+{% endblock %}
+</body>

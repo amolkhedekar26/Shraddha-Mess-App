@@ -1,0 +1,220 @@
+{% load static %}
+<body>
+{% block body %}
+    <div class="servermain mt-2">
+        <div class="serverindex_row row">
+            <div class="card mx-auto my-2 mb-auto servercard">
+                <img class="card-img-top mx-auto servercardimage"
+                     src="{% static 'images/shift.png' %}"
+                     alt="Attendance">
+                <div class="card-body">
+                    <div align="center" class="menudata">
+                        View and manage attendance
+                    </div>
+                    <hr/>
+                    <div align="center" class="menudata">
+                        <a href="/manage-attendance/" class="btn makebelow btn-lg btn-primary">Attendance</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card mx-auto my-2 mb-auto servercard">
+                <img class="card-img-top mx-auto servercardimage"
+                     src="{% static 'images/newdiningicon.png' %}"
+                     alt="Menu">
+                <div class="card-body">
+                    <div align="center" class="menudata">
+                        View and edit the daily menu
+                    </div>
+                    <hr/>
+                    <div align="center" class="menudata">
+                        <a href="/manage-menu/" class="btn makebelow btn-lg btn-primary">Menu</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card mx-auto my-2 mb-auto servercard">
+                <img class="card-img-top mx-auto servercardimage"
+                     src="{% static 'images/edit_student.png' %}"
+                     alt="Students">
+                <div class="card-body">
+                    <div align="center" class="menudata">
+                        View and edit the registered students
+                    </div>
+                    <hr/>
+                    <div align="center" class="menudata">
+                        <a href="/manage-students/" class="btn makebelow btn-lg btn-primary">Students</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="serverindex_row row mt-2">
+            <div class="card mx-auto my-2 mb-auto servercard">
+                <img class="card-img-top mx-auto servercardimage"
+                     src="{% static 'images/bill.png' %}"
+                     alt="Bill">
+                <div class="card-body">
+                    <div align="center" class="menudata">
+                        Calculate the bill of month of student
+                    </div>
+                    <hr/>
+                    <div align="center" class="menudata">
+                        <a href="/bill/" class="btn btn-lg makebelow btn-primary">Generate Bill</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card mx-auto my-2 mb-auto servercard">
+                <img class="card-img-top mx-auto servercardimage"
+                     src="{% static 'images/absent.png' %}"
+                     alt="Daily Absenties">
+                <div class="card-body">
+                    <div align="center" class="menudata">
+                        View daily absenty of students
+                    </div>
+                    <hr/>
+                    <div align="center" class="menudata">
+                        <a id="absentlistbutton">
+                            <button class="btn btn-primary btn-lg  makebelow" id="absentbutton">Absent Students</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card mx-auto my-2 mb-auto servercard">
+                <img class="card-img-top mx-auto servercardimage"
+                     src="{% static 'images/rupee.png' %}"
+                     alt="Rate">
+                <div class="card-body">
+                    <div align="center" class="menudata">
+                        View and change the price of plate
+                    </div>
+                    <hr/>
+                    <div align="center" class="menudata">
+                        <a id="pricechangebutton">
+                            <button class="btn btn-primary btn-lg  makebelow" id="pricechange">Change Price</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="remodal" data-remodal-id="newabsentmodal">
+        <button data-remodal-action="close" class="remodal-close text-danger"></button>
+        <h3 align="center" class="menudaydiv">
+            <span class="badge badge-pill badge-info mt-0 menudayname"> Daily Absenty</span>
+        </h3>
+        <div class="col-xs-1 mt-5">
+            <div>
+                <label class="absent_title">Afternoon : </label>
+                <label id="noonlabel" class="ml-3 absent_value"> </label>
+            </div>
+            <div>
+                <label class="absent_title">Night : </label>
+                <label id="nightlabel" class="ml-3 absent_value"> </label>
+            </div>
+            <div class="price_button_div">
+                <button data-remodal-action="cancel" class="btn btn-outline-danger">Close</button>
+            </div>
+        </div>
+    </div>
+    <div class="remodal" data-remodal-id="newpricemodal">
+        <button data-remodal-action="close" class="remodal-close text-danger"></button>
+        <h3 align="center" class="menudaydiv">
+            <span class="badge badge-pill badge-info mt-0 menudayname"> Change Price</span>
+        </h3>
+        <div class="col-xs-1 price_div mt-5 mb-5">
+            <input class="form-control" id="price" type="text" onclick="$(this).removeAttr('readonly');" readonly>
+        </div>
+        <button data-remodal-action="cancel" class="btn btn-outline-danger">Close</button>
+        <button data-remodal-action="confirm" id="updateprice" onclick="set_price()" class="btn btn-success ml-5"
+                disabled>
+            Update
+        </button>
+    </div>
+{% endblock %}
+<script>
+    let priceinput = document.getElementById("price");
+    priceinput.addEventListener('focus', function () {
+        $('#updateprice').removeAttr("disabled");
+    });
+
+    $('#pricechange').click(function () {
+        document.getElementById("pricechangebutton").setAttribute("data-remodal-target", "newpricemodal");
+        getPrice();
+    });
+
+    $('#absentbutton').click(function () {
+        document.getElementById("absentlistbutton").setAttribute("data-remodal-target", "newabsentmodal");
+        getAbsent();
+    });
+
+    function getAbsent() {
+        let xmlhttp;
+        if (window.XMLHttpRequest) {
+            xmlhttp = new XMLHttpRequest();
+        } else {
+            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xmlhttp.open('GET', '/get-absent/', true);
+        xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xmlhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                let ans = JSON.parse(this.response);
+                $('#noonlabel').text(ans["afternoon"]);
+                $('#nightlabel').text(ans["night"]);
+            }
+        };
+        xmlhttp.send();
+    }
+
+    function getPrice() {
+        let xmlhttp;
+        if (window.XMLHttpRequest) {
+            xmlhttp = new XMLHttpRequest();
+        } else {
+            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xmlhttp.open('GET', '/get-price/', true);
+        xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xmlhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                let price = JSON.parse(this.response);
+                $('#price').val(price["price"]);
+            }
+        };
+        xmlhttp.send();
+    }
+
+    function set_price() {
+        let price = document.getElementById("price").value;
+        if (price == "" || price == null) {
+            $('#updateprice').removeAttr("data-remodal-action");
+            var toast = new iqwerty.toast.Toast();
+            toast.setText('Please enter price')
+                .stylize({
+                    background: '#F1948A',
+                    color: 'black',
+                    'box-shadow': '0 0 50px rgba(0, 0, 0, .7)'
+                })
+                .show();
+        }
+        if (price != "" && price != null) {
+            document.getElementById("updateprice").setAttribute("data-remodal-action", "confirm");
+            let xmlhttp;
+            if (window.XMLHttpRequest) {
+                xmlhttp = new XMLHttpRequest();
+            } else {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.open('POST', '/set-price/', true);
+            xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xmlhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    var toast = new iqwerty.toast.Toast();
+                    toast.setText('Price updated')
+                        .show();
+                }
+            };
+            xmlhttp.send("price=" + price);
+        }
+
+    }
+</script>
+</body>

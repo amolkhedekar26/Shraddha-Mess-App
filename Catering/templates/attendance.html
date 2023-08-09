@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% load static %}
+<head>
+    <title>{% block title %}Attendance{% endblock %}</title>
+</head>
+<body>
+{% block body %}
+    <div class="m-2 mydiv">
+        <h1 class="text-center mt-3 ">Daily Attendance</h1>
+        <div class="mt-4 datepickerdiv">
+            <input id="datepick" class="ml-4" readonly/>
+        </div>
+        <div class="mt-4 attendance_button_div">
+            <div class="container ">
+                <div class="row">
+                    <div id="afternoon" class="attendnace_two_cards shadow col-sm  mb-2 border border-dark">
+                        <h4 align="center" class="timetags"><span
+                                class="span_time badge badge-pill badge-info mt-0"> AfterNoon</span></h4>
+                        <center>
+                            <div class="mt-normal-navi mt-4 switchbutton">
+                                <input name="noon" id="switchnoon" type="checkbox"/>
+                                <label for="switchnoon"></label>
+                            </div>
+                        </center>
+                    </div>
+                    <div id="night" class="attendnace_two_cards shadow col-sm border border-dark">
+                        <h4 align="center" class="timetags"><span
+                                class="span_time badge badge-pill badge-info mt-0">Night</span></h4>
+                        <center>
+                            <div class="mt-normal-navi mt-4 switchbutton">
+                                <input name="night" id="switchnight" type="checkbox"/>
+                                <label for="switchnight"></label>
+                            </div>
+                        </center>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div align="center">
+            <label><em><span><i class="fa fa-info-circle"></i> </span>Enable the button to indicate
+                absenty.</em></label>
+
+        </div>
+        <div align="center">
+            <a onclick="myFunction()" id="mybtn" class="text-white mybt btn btn-lg btn-primary">Save Attendance</a>
+        </div>
+    </div>
+    <script>
+        let morning_limit = "10";
+        let evening_limit = "16";
+        let noondiv = document.getElementById("afternoon");
+        let nightdiv = document.getElementById("night");
+        let switchafter = document.getElementById("switchnoon");
+        let switchnight = document.getElementById("switchnight");
+        let h6 = document.createElement("h6");
+        let textnode = document.createTextNode("Sorry ! You can't. Time is up ");         // Create a text node
+        h6.appendChild(textnode);
+        h6.setAttribute("id", "myalert");
+        h6.setAttribute("class", "text-danger");
+        h6.setAttribute("style", "text-align:center");
+        let h62 = document.createElement("h6");
+        let textnode2 = document.createTextNode("Sorry ! You can't. Time is up ");         // Create a text node
+        h62.appendChild(textnode2);
+        h62.setAttribute("id", "myalert2");
+        h62.setAttribute("class", "text-danger");
+        h62.setAttribute("style", "text-align:center");
+        let sd = document.getElementById("datepick");
+        const picker = datepicker(sd, {
+            minDate: new Date(),
+            onSelect: function () {
+                let current_date = sd.value;
+                var dat = new Date();
+                if (current_date == new Date().toDateString()) {
+                    if (dat.getHours() >= morning_limit) {
+
+                        switchafter.setAttribute("disabled", true);
+                        noondiv.appendChild(h6);
+                    }
+                    if (dat.getHours() >= evening_limit) {
+                        switchnight.setAttribute("disabled", true);
+                        nightdiv.appendChild(h62);
+                    }
+                } else {
+                    switchafter.removeAttribute("disabled");
+                    switchnight.removeAttribute("disabled");
+                    let a = document.getElementById("myalert");
+                    let b = document.getElementById("myalert2");
+                    if (noondiv.contains(a)) {
+                        noondiv.removeChild(a);
+                    }
+                    if (nightdiv.contains(b)) {
+                        nightdiv.removeChild(b);
+                    }
+                }
+            }
+        });
+        picker.setDate(new Date());
+        let date = new Date();
+        if (date.getMonth() < 10) {
+            m = "0" + (date.getMonth() + 1);
+        }
+        let newdate = date.getDate() + "-" + m + "-" + date.getFullYear();
+        let todaydate = sd.value;
+        if (todaydate == date.toDateString() && date.getHours() >= morning_limit) {
+
+            switchafter.setAttribute("disabled", true);
+            noondiv.appendChild(h6);
+        }
+        if (todaydate == date.toDateString() && date.getHours() >= evening_limit) {
+
+            switchnight.setAttribute("disabled", true);
+            nightdiv.appendChild(h62);
+        }
+
+        function myFunction() {
+            var noon_present = document.getElementById("switchnoon");
+            var night_present = document.getElementById("switchnight");
+            var a = 1, b = 1;
+            let noonb = noon_present.getAttribute("disabled");
+            let nightb = night_present.getAttribute("disabled");
+            if (noon_present.checked) {
+                a = 0;
+            }
+            if (night_present.checked) {
+                b = 0;
+            }
+            if (noonb) {
+                a = 1;
+            }
+            if (nightb) {
+                b = 1;
+            }
+            let m = "";
+            var date = sd.value;
+            let sxc = new Date(date);
+            if (sxc.getMonth() < 10) {
+                m = "0" + (sxc.getMonth() + 1);
+            }
+            let nbsxc = sxc.getDate() + "-" + m + "-" + sxc.getFullYear();
+            let xmlhttp;
+            if (window.XMLHttpRequest) {
+                xmlhttp = new XMLHttpRequest();
+            } else {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.open('POST', '/save-attendance/', true);
+            xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xmlhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    var toast = new iqwerty.toast.Toast();
+                    toast.setText('Attendance saved')
+                        .show();
+                }
+            };
+            xmlhttp.send("date=" + nbsxc + "&noon=" + a + "&night=" + b);
+        }
+
+        $('#nav_attendance').addClass("active");
+    </script>
+{% endblock %}
+</body>

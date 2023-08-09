@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+<body>
+{% block body %}
+    <div id="mynav" class="menuhistorydiv mt-3">
+        <div><h2 class="historytitle">Manage Menu</h2></div>
+        <ul id="thenav" class="nav mylist  nav-tabs">
+            {% for day in days %}
+                {% if day == current_day %}
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="">{{ day }}</a>
+                    </li>
+                {% endif %}
+                {% if day != current_day %}
+                    <li class="nav-item">
+                        <a class="nav-link " data-toggle="tab" href="">{{ day }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+        <div class="tab-contentm mt-3">
+            <div id="mytab" class="tab-pane active">
+                <div class="menuserverindex_row row">
+                    <div class="card mx-auto my-2 mb-auto servermenucard">
+                        <h4 align="center" class="mt-2">
+                            <span class="badge badge-pill mt-0 servermenudayname"> Afternoon</span>
+                        </h4>
+                        <div class="card-body ">
+                            <div align="center" class="servermenudata">
+                                <textarea id="afternoonmenutextarea" class="form-control menutextarea menucenterinput"
+                                          readonly>
+
+                        </textarea>
+                            </div>
+                            <hr/>
+                            <div align="center" class="menudata">
+                                <button id="aftedit" class="makebig btn btn-primary mbt">Edit</button>
+                                <button id="aftesave" class="makebig btn btn-success ml-5" disabled>Update</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mx-auto my-2 mb-auto servermenucard">
+                        <h4 align="center" class="mt-2">
+                            <span class="badge badge-pill mt-0 servermenudayname">Night</span>
+                        </h4>
+                        <div class="card-body ">
+                            <div align="center" class="servermenudata">
+                                <textarea id="nightmenutextarea" class="form-control menutextarea menucenterinput"
+                                          readonly>
+
+                        </textarea>
+                            </div>
+                            <hr/>
+                            <div align="center" class="menudata">
+                                <button id="nigedit" class="makebig btn btn-primary mbt">Edit</button>
+                                <button id="nigsave" class="makebig btn btn-success ml-5" disabled>Update</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        let day_no = new Date().getDay();
+        let curent_day = days[day_no];
+        let objects = document.getElementById("thenav").querySelectorAll(".nav-link");
+        for (i = 0; i < objects.length; i++) {
+            let a = objects[i].textContent;
+            objects[i].addEventListener("click", () => {
+                showrecords(a);
+
+            });
+        }
+        let obje = document.getElementById("thenav").querySelectorAll(".active");
+        document.getElementById("aftesave").addEventListener("click", function () {
+            let selected_day = document.getElementById("thenav").querySelectorAll(".active");
+            let menu = document.getElementById("afternoonmenutextarea").value;
+            let myflag = "noon";
+            save_menu(selected_day[0].textContent, menu, myflag);
+        });
+        document.getElementById("nigsave").addEventListener("click", function () {
+            let selected_day = document.getElementById("thenav").querySelectorAll(".active");
+            let menu = document.getElementById("nightmenutextarea").value;
+            let myflag = "night";
+            save_menu(selected_day[0].textContent, menu, myflag);
+        });
+        showrecords(curent_day);
+        let aftedit = document.getElementById("aftedit");
+        aftedit.addEventListener("click", function () {
+            document.getElementById("afternoonmenutextarea").removeAttribute("readonly");
+            $('#afternoonmenutextarea').focus();
+        });
+        let nigedit = document.getElementById("nigedit");
+        nigedit.addEventListener("click", function () {
+            document.getElementById("nightmenutextarea").removeAttribute("readonly");
+            $('#nightmenutextarea').focus();
+        });
+        document.getElementById("afternoonmenutextarea").addEventListener("focus",function () {
+            $('#aftesave').removeAttr("disabled");
+        });
+        document.getElementById("nightmenutextarea").addEventListener("focus",function () {
+            $('#nigsave').removeAttr("disabled");
+        });
+        function showrecords(day) {
+            let xmlhttp;
+            if (window.XMLHttpRequest) {
+                xmlhttp = new XMLHttpRequest();
+            } else {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.open('GET', '/get-admin-menu/' + day + "/", true);
+            xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xmlhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    let ans = JSON.parse(this.response);
+                    $('#afternoonmenutextarea').val(ans[0].afternoon);
+                    $('#nightmenutextarea').val(ans[0].night);
+                }
+            }
+            xmlhttp.send();
+        }
+
+        function save_menu(day, menu, myflag) {
+
+            let xmlhttp;
+            if (window.XMLHttpRequest) {
+                xmlhttp = new XMLHttpRequest();
+            } else {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.open('POST', '/admin-save-menu/', true);
+            xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xmlhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    var toast = new iqwerty.toast.Toast();
+                    toast.setText('Updated')
+                        .show();
+                }
+            };
+            xmlhttp.send("day=" + day + "&time=" + menu + "&flag=" + myflag);
+        }
+    </script>
+{% endblock %}
+</body>

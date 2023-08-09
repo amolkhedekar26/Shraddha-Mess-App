@@ -1,0 +1,291 @@
+{% extends 'base.html' %}
+{% load static %}
+<body>
+{% block body %}
+    <div id="mynav" class="historydiv mt-3">
+        <h2 class="historytitle"> Manage Students </h2>
+        <div class="attendance-content mt-3">
+            <div id="mytab" class="tab-pane active">
+                <input type="text" class="form-control centerinput awesomplete mt-2" id="studentname" name="studentname"
+                       placeholder="Enter Mess No. or Name">
+                <center>
+                    <a id="stdid">
+                        <button class="btn btn-success mt-3" id="studentsearch">Search</button>
+                    </a>
+                </center>
+                <table id="studenttable" align="center" class="mt-5 mb-5">
+                    <tr class="historytableheader">
+                        <th class="cell">Mess No.</th>
+                        <th class="cell">Name</th>
+                    </tr>
+                    {% for student in students %}
+                        <tr>
+                            <td height="50" class="cell">{{ student.id }}</td>
+                            <td height="50" class="cell"><a class="btn  anchorbutton"
+                                                            data-remodal-target="newstudentsmodal{{ student.id }}"
+                                                            href=""> {{ student.first_name }} {{ student.last_name }}</a>
+                            </td>
+                        </tr>
+                        <div class="remodal" id="newmodal{{ student.id }}"
+                             data-remodal-id="newstudentsmodal{{ student.id }}">
+                            <button data-remodal-action="close" class="remodal-close text-danger"></button>
+                            <h3 align="center" class="menudaydiv">
+                                <span class="badge badge-pill badge-info mt-0 menudayname"> Student Profile</span>
+                            </h3>
+                            <form id="newbottomform{{ student.id }}">
+                                <div class="col-xs-1 price_div mt-5">
+                                    <div>
+                                        <label class="student_title">Email: </label>
+                                    </div>
+                                    <input class="form-control smail studdent_profile_input"
+                                           id="s_email{{ student.id }}"
+                                           name="s_email"
+                                           type="text"
+                                           value="{{ student.email }}" readonly>
+                                </div>
+                                <div class="col-xs-1 price_div mt-3">
+                                    <div>
+                                        <label class="student_title">First Name : </label>
+                                    </div>
+                                    <input class="form-control studdent_profile_input ml-4" id="s_fname{{ student.id }}"
+                                           name="s_fname"
+                                           type="text"
+                                           value="{{ student.first_name }}" onclick="$(this).removeAttr('readonly');"
+                                           readonly>
+                                </div>
+                                <div class="col-xs-1 price_div mt-3">
+                                    <div>
+                                        <label class="student_title">Last Name : </label>
+                                    </div>
+                                    <input class="form-control studdent_profile_input ml-4" id="s_lname{{ student.id }}"
+                                           name="s_lname"
+                                           type="text"
+                                           value="{{ student.last_name }}" onclick="$(this).removeAttr('readonly');"
+                                           readonly>
+                                </div>
+                                <div class="col-xs-1 price_div mt-3">
+                                    <div>
+                                        <label class="student_title">Mobile No : </label>
+                                    </div>
+                                    <input class="form-control studdent_profile_input ml-4" id="s_mob{{ student.id }}"
+                                           name="s_mob"
+                                           type="text"
+                                           value="{{ student.mobile_no }}" onclick="$(this).removeAttr('readonly');"
+                                           readonly>
+                                </div>
+                                <button data-remodal-action="cancel" class=" mt-5 btn btn-outline-danger">Close</button>
+                                <button id="newmodalupdate{{ student.id }}" data-remodal-action="confirm"
+                                        class="mt-5 btn btn-success ml-5" disabled>Update
+                                </button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="remodal" id="newmodal" data-remodal-id="newstudentsmodal">
+        <button data-remodal-action="close" class="remodal-close text-danger"></button>
+        <h3 align="center" class="menudaydiv">
+            <span class="badge badge-pill badge-info mt-0 menudayname"> Student Profile</span>
+        </h3>
+        <form id="newbottomform">
+            <div class="col-xs-1 price_div mt-5">
+                <div>
+                    <label class="student_title">Email: </label>
+                </div>
+                <input class="form-control smail studdent_profile_input" id="s_bemail" name="s_email"
+                       type="text"
+                       value="{{ student.email }}" readonly>
+            </div>
+            <div class="col-xs-1 price_div mt-3">
+                <div>
+                    <label class="student_title">First Name : </label>
+                </div>
+                <input class="form-control studdent_profile_input ml-4" id="s_bfname" name="s_fname"
+                       type="text"
+                       value="{{ student.first_name }}" onclick="$(this).removeAttr('readonly');"
+                       readonly>
+            </div>
+            <div class="col-xs-1 price_div mt-3">
+                <div>
+                    <label class="student_title">Last Name : </label>
+                </div>
+                <input class="form-control studdent_profile_input ml-4" id="s_blname" name="s_lname"
+                       type="text"
+                       value="{{ student.last_name }}" onclick="$(this).removeAttr('readonly');"
+                       readonly>
+            </div>
+            <div class="col-xs-1 price_div mt-3">
+                <div>
+                    <label class="student_title">Mobile No : </label>
+                </div>
+                <input class="form-control studdent_profile_input ml-4" id="s_bmob" name="s_mob"
+                       type="text"
+                       value="{{ student.mobile_no }}" onclick="$(this).removeAttr('readonly');"
+                       readonly>
+            </div>
+            <button data-remodal-action="cancel" class=" mt-5 btn btn-outline-danger">Close</button>
+            <button data-remodal-action="confirm" id="newmodalupdate" class="mt-5 btn btn-success ml-5" disabled>Update
+            </button>
+        </form>
+    </div>
+    <script>
+        let arr = new Array();
+        let newarr = new Array();
+        {% for student in students %}
+            arr.push("{{ student.first_name }}" + " " + "{{ student.last_name }}");
+        {% endfor %}
+        getmapping();
+        enablebutton();
+        submitform();
+        listsubmitform();
+
+        function submitform() {
+            $('#newmodalupdate').click(function () {
+                let xmlhttp;
+                if (window.XMLHttpRequest) {
+                    xmlhttp = new XMLHttpRequest();
+                } else {
+                    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+                }
+                xmlhttp.open('POST', '/admin-save-students/', true);
+                xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                xmlhttp.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        var toast = new iqwerty.toast.Toast();
+                        toast.setText('Profile Updated')
+                            .show();
+                    }
+                };
+                xmlhttp.send($('#newbottomform').serialize());
+            });
+        }
+
+        function listsubmitform() {
+            let xmlhttp;
+            if (window.XMLHttpRequest) {
+                xmlhttp = new XMLHttpRequest();
+            } else {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.open('POST', '/admin-save-students/', true);
+            xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xmlhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    var toast = new iqwerty.toast.Toast();
+                    toast.setText('Profile Updated')
+                        .show();
+                }
+            };
+            {% for student in students %}
+                let formname{{ student.id }} = "#newbottomform" +{{ student.id }};
+                let buttonname{{ student.id }} = "#newmodalupdate" +{{ student.id }};
+                $(buttonname{{ student.id }}).click(function () {
+                    xmlhttp.send($(formname{{ student.id }}).serialize());
+                });
+            {% endfor %}
+        }
+
+        function enablebutton() {
+            let objects = document.getElementById("newmodal").querySelectorAll(".form-control");
+            for (i = 0; i < objects.length; i++) {
+                objects[i].addEventListener("focus", () => {
+                    $('#newmodalupdate').removeAttr("disabled");
+
+                });
+            }
+            {% for student in students %}
+                let myobjects{{ student.id }} = document.getElementById("newmodal{{ student.id }}").querySelectorAll(".form-control");
+                for (i = 0; i < myobjects{{ student.id }}.length; i++) {
+                    myobjects{{ student.id }}[i].addEventListener("focus", () => {
+                        $('#newmodalupdate{{ student.id }}').removeAttr("disabled");
+
+                    });
+                }
+            {% endfor %}
+        }
+
+        function getmapping() {
+            let xmlhttp;
+            if (window.XMLHttpRequest) {
+                xmlhttp = new XMLHttpRequest();
+            } else {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.open('GET', '/get-email-user-mapping/', true);
+            xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xmlhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    let mydata = JSON.parse(this.response);
+                    newarr = mydata;
+                }
+            };
+            xmlhttp.send();
+        }
+
+        var input = document.getElementById("studentname");
+        new Awesomplete(input, {
+            list: arr
+        });
+
+        $("#studentsearch").click(function () {
+            if (!$('#studentname').val() == "" || !$('#studentname').val() == null) {
+
+
+                let useremail;
+                let sdata = $('#studentname').val();
+                var isnum = /^\d+$/.test(sdata);
+                if (isnum) {
+                    sdata.trim();
+                    useremail = sdata;
+                } else {
+                    let mn = new Array();
+                    let myans = {};
+                    for (var i = 0; i < newarr.length; i++) {
+                        mn.push(newarr[i].name);
+                        myans[newarr[i].name] = newarr[i].email;
+                    }
+                    let check = mn.includes(sdata);
+                    if (check) {
+                        useremail = myans[sdata];
+                    }
+                }
+                document.getElementById("stdid").setAttribute("data-remodal-target", "newstudentsmodal");
+                getprofileinfo(useremail);
+            } else {
+                var toast = new iqwerty.toast.Toast();
+                toast.setText('Please enter mess no or name')
+                    .stylize({
+                        background: '#F1948A',
+                        color: 'black',
+                        'box-shadow': '0 0 50px rgba(0, 0, 0, .7)'
+                    })
+                    .show();
+            }
+        });
+
+        function getprofileinfo(email) {
+            let xmlhttp;
+            if (window.XMLHttpRequest) {
+                xmlhttp = new XMLHttpRequest();
+            } else {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            let callurl = "/admin-get-students/?email=" + email;
+            xmlhttp.open('GET', callurl, true);
+            xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xmlhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    let ans = JSON.parse(this.response);
+                    $('#s_bemail').val(ans[0].email);
+                    $('#s_bfname').val(ans[0].f_name);
+                    $('#s_blname').val(ans[0].l_name);
+                    $('#s_bmob').val(ans[0].mob_no);
+                }
+            };
+            xmlhttp.send();
+        }
+    </script>
+{% endblock %}
+</body>

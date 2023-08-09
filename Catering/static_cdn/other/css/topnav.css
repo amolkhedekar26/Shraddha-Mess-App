@@ -1,0 +1,53 @@
+
+@font-face {
+    font-family: Poppins-Regular;
+    src: url('/static/fonts/poppins/Poppins-Regular.ttf');
+}
+
+@font-face {
+    font-family: Poppins-Bold;
+    src: url('/static/fonts/poppins/Poppins-Bold.ttf');
+}
+
+@font-face {
+    font-family: Poppins-Medium;
+    src: url('/static/fonts/poppins/Poppins-Medium.ttf');
+}
+
+@font-face {
+    font-family: Montserrat-Bold;
+    src: url('/static/fonts/montserrat/Montserrat-Bold.ttf');
+}
+
+.topnav {
+    width: 100%;
+    overflow: hidden;
+    background-color: #333;
+}
+
+.topnav a {
+    float: left;
+    color: #f2f2f2;
+    text-align: center;
+    margin: 5px;
+    border-radius: 5px;
+    padding: 10px 10px 10px 10px;
+}
+
+.topnav a:hover {
+    background-color: #F9E79F;
+    color: black;
+}
+
+.topnav a.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.limiter {
+    width: 100%;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+

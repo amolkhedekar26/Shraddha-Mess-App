@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+<head>
+    <title>{% block title %}Home{% endblock %}</title>
+    {% block meta %}
+        <meta name="description" content="This Website handles students attendance in Mess.">
+        <link rel="canonical" href="http://192.168.43.50:8000/"/>
+        <meta name="robots" content="index">
+    {% endblock %}
+
+</head>
+<body>
+{% block body %}
+    {% if request.user.is_superuser %}
+        {% include 'server.html' %}
+    {% else %}
+        {% include 'client.html' %}
+    {% endif %}
+    <script>
+    $('#Home').addClass("active");
+    </script>
+{% endblock %}
+</body>

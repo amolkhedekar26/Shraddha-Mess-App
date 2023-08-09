@@ -1,0 +1,34 @@
+{% load static %}
+<body>
+{% block body %}
+    <div class="main maincontent mt-5">
+        <div class="index_row row">
+            <div class="col-md-4 col-sm-12 card cardstyle">
+                <div class="card-body card-body-style">
+                    <img class="card-img-top card-back-img  myimg "
+                         src="{% static 'images/attendance.png' %}" alt="Attendance">
+                    <p class="card-text index_para text-black mt-5">Fill the attendance.</p>
+                    <a href="/attendance/" class="btn btn-lg btn-primary mt-4">Attendance</a>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12 card cardstyle">
+                <div class="card-body card-body-style">
+                    <img class="card-img-top card-back-img  myimg "
+                         src="{% static 'images/menu.png' %}" alt="Menu">
+                    <p class="card-text index_para text-black mt-5">View the menu card.</p>
+                    <a href="/menu/" class="btn btn-lg btn-primary mt-4">Menu</a>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12 card cardstyle">
+                <div class="card-body card-body-style">
+                    <img class="card-img-top card-back-img  myimg ml-4"
+                         src="{% static 'images/magnifying-glass.png' %}"
+                         alt="History">
+                    <p class="card-text index_para text-black mt-5">View attendance history</p>
+                    <a href="/history/" class="btn btn-lg btn-primary mt-4">History</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+</body>

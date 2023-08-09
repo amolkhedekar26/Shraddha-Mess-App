@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" xmlns:b="http://www.w3.org/1999/html">
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="">
+    {% block meta %}
+    {% endblock %}
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'other/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'authentication/vendor/bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css"
+          href="{% static 'authentication/fonts/font-awesome-4.7.0/css/font-awesome.min.css' %}">
+    <link rel=" stylesheet" type="text/css" href="{% static 'authentication/vendor/animate/animate.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'authentication/css/util.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'authentication/css/main.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'simpleswitch/allToggles.f737c8b5.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'simpleswitch/moretoggles.ab271ea8.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'datepicker/datepicker.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'select2/select2.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'awesomplete/awesomplete.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'Remodal/dist/remodal.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'Remodal/dist/remodal-default-theme.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'sidebar/sidebar.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'other/css/base.css' %}">
+</head>
+<body>
+<script src="{% static 'other/js/jquery.min.js' %}"></script>
+<script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'datepicker/datepicker.min.js' %}"></script>
+<script src="{% static 'select2/select2.min.js' %}"></script>
+<script src="{% static 'awesomplete/awesomplete.js' %}"></script>
+<script src="{% static 'Remodal/dist/remodal.min.js' %}"></script>
+<script src="{% static 'other/js/toast.js' %}"></script>
+<script src="{% static 'other/js/fontawesome.js' %}"></script>
+<div class="limiter">
+    <div id="topnav" class="topnav">
+        {% if request.user.is_superuser %}
+            <div class="topnav-left">
+                <span class="title_brand d-none d-md-block h4 my-3">Mess Administration</span>
+            </div>
+            <div class="topnav-right">
+            <div class="topnav_right_block">
+            </div>
+            <a id="Home" class="btn" href="/">Home</a>
+            {% if not request.user.is_authenticated %}
+                <a class="btn" href="/login/">Login</a>
+                <a class="btn" href="/signup/">Signup</a>
+            {% else %}
+                <a class="btn" href="/logout/">Logout</a>
+                <a class="btn" href="#"><span><i class="fa fa-user mr-2"></i> </span>{{ request.user.first_name }}
+                </a>
+            {% endif %}
+        {% else %}
+            <div class="topnav-left">
+                <span class="title_brand d-none d-md-block h4 my-3">Will's Dining</span>
+            </div>
+            <div class="topnav-right">
+            <div class="topnav_right_block">
+            </div>
+            <a id="Home" class="btn" href="/">Home</a>
+            <a id="nav_menu" class="btn" href="/menu/" title="See Menu card">Menu</a>
+            <a id="nav_attendance" class="btn" href="/attendance/" title="Fill the attendance">Attendance</a>
+            <a id="nav_history" class="btn" href="/history/" title="See attendance history">History</a>
+            {% if not request.user.is_authenticated %}
+                <a class="btn" href="/login/">Login</a>
+                <a class="btn" href="/signup/">Signup</a>
+            {% else %}
+                <a class="btn" href="/logout/">Logout</a>
+                <a class="btn" href="#"><span><i class="fa fa-user mr-2"></i> </span>{{ request.user.first_name }}
+                </a>
+            {% endif %}
+        {% endif %}
+        </div>
+        </div>
+    </div>
+</div>
+{% block body %}
+{% endblock %}
+</body>
+</html>

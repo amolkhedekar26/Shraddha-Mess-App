@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+{% load static %}
+<body>
+{% block body %}
+    <div id="mynav" class="historydiv mt-3">
+        <div><h2 class="historytitle">Attendance History</h2></div>
+        <h5 class="historytitle mt-4">Name : {{ f_name }} {{ l_name }}</h5>
+        <h5 class="historytitle">Mess No : {{ mess_no }}</h5>
+        <ul id="thenav" class="nav mylist  nav-tabs">
+            {% for month in months %}
+                {% if month == current_month %}
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="">{{ month }}</a>
+                    </li>
+                {% endif %}
+                {% if month != current_month %}
+                    <li class="nav-item">
+                        <a class="nav-link " data-toggle="tab" href="">{{ month }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+        <div class="tab-contentm mt-3">
+            <div id="mytab" class="tab-pane active">
+                <table id="mytable">
+                    <tr class="historytableheader">
+                        <th class="cell">Date</th>
+                        <th class="cell">Noon</th>
+                        <th class="cell">Night</th>
+                        <th class="cell"></th>
+                        <th class="cell"></th>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        let month_name = new Date().toLocaleString('default', {month: 'long'});
+        showrecords(month_name);
+        let objects = document.getElementById("thenav").querySelectorAll(".nav-link");
+        for (i = 0; i < objects.length; i++) {
+            let a = objects[i].textContent;
+            objects[i].addEventListener("click", () => {
+                showrecords(a);
+
+            });
+        }
+
+        function showrecords(month) {
+            let xmlhttp;
+            if (window.XMLHttpRequest) {
+                xmlhttp = new XMLHttpRequest();
+            } else {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.open('GET', '/get-admin-records/' + month + "/", true);
+            xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xmlhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    $('#mytable tr').slice(1).remove();
+                    let ans = JSON.parse(this.response);
+                    for (var i = 0; i < ans.length; i++) {
+                        let mytable = document.getElementById("mytable");
+                        let rows = mytable.rows.length;
+                        x = document.getElementById('mytable').insertRow(rows);
+                        var y = x.insertCell(0);
+                        var z = x.insertCell(1);
+                        var w = x.insertCell(2);
+                        var p = x.insertCell(3);
+                        var q = x.insertCell(4);
+                        y.className = "cell mobfont";
+                        z.className = "cell";
+                        w.className = "cell";
+                        p.className = "cell";
+                        q.className = "cell";
+                        let afternoon;
+                        let night;
+                        let aft = ans[i].attendance[0];
+                        let ngt = ans[i].attendance[1];
+                        let aftid = "nooninput" + i;
+                        let nightid = "nightinput" + i;
+                        y.innerHTML = ans[i].date;
+                        let input1 = document.createElement("input");
+                        let input2 = document.createElement("input");
+                        input1.setAttribute("type", "text");
+                        input1.setAttribute("readonly", true);
+                        input1.setAttribute("id", aftid);
+                        input1.setAttribute("class", "form-control tableinput col-xs-1");
+                        input2.setAttribute("type", "text");
+                        input2.setAttribute("readonly", true);
+                        input2.setAttribute("id", nightid);
+                        input2.setAttribute("class", "form-control awesomplete tableinput col-xs-1");
+                        if (aft == "1") {
+                            afternoon = "Present";
+                        } else {
+                            afternoon = "Absent";
+                            z.className = "danger_cell";
+                            input1.className += "form-control danger_table_input col-xs-1";
+                        }
+                        if (ngt == "1") {
+                            night = "Present";
+                        } else {
+                            night = "Absent";
+                            w.className = "danger_cell";
+                            input2.className += "form-control danger_table_input col-xs-1";
+
+                        }
+                        input1.setAttribute("value", afternoon);
+                        input2.setAttribute("value", night);
+                        z.appendChild(input1);
+                        w.appendChild(input2);
+                        new Awesomplete(input1, {
+                            list: ["Present", "Absent"]
+                        });
+                        new Awesomplete(input2, {
+                            list: ["Present", "Absent"]
+                        });
+                        let editbutton = document.createElement("input");
+                        let editbtnid = "editbutton" + i;
+                        editbutton.setAttribute("type", "button");
+                        editbutton.setAttribute("id", editbtnid);
+                        editbutton.setAttribute("value", "Edit");
+                        editbutton.setAttribute("class", "mbt btn btn-primary");
+                        editbutton.addEventListener("click", function () {
+                            input1.removeAttribute("readonly");
+                            input2.removeAttribute("readonly");
+                        });
+                        p.appendChild(editbutton);
+
+                        let savebutton = document.createElement("input");
+                        let savebtnid = "savebutton" + i;
+                        savebutton.setAttribute("type", "button");
+                        savebutton.setAttribute("id", savebtnid);
+                        savebutton.setAttribute("value", "Save");
+                        savebutton.setAttribute("class", "btn btn-success");
+                        savebutton.addEventListener("click", function () {
+                            let noonid = "#" + aftid;
+                            let ngtid = "#" + nightid;
+                            let ab = $(noonid).val();
+                            let cd = $(ngtid).val();
+                            let na = 0, nb = 0;
+                            if (ab == "Present") {
+                                na = 1
+                            } else {
+                                na = 0;
+                            }
+                            if (cd == "Present") {
+                                nb = 1;
+                            } else {
+                                nb = 0;
+                            }
+                            let emailuser = "{{ request.session.student }}";
+                            let fg = new Array([na, nb]);
+                            let sdate = $(this).closest("tr")
+                                .find(".mobfont")
+                                .text();
+                            let cell_date = sdate + ",2020";
+                            let date = new Date(cell_date);
+                            if (date.getMonth() < 10) {
+                                m = "0" + (date.getMonth() + 1);
+                            }
+                            let newdate = date.getDate() + "-" + m + "-" + date.getFullYear();
+                            let xmlhttp;
+                            if (window.XMLHttpRequest) {
+                                xmlhttp = new XMLHttpRequest();
+                            } else {
+                                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+                            }
+                            xmlhttp.open('POST', '/admin-save-attendance/', true);
+                            xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                            xmlhttp.onreadystatechange = function () {
+                                if (this.readyState == 4 && this.status == 200) {
+                                    var toast = new iqwerty.toast.Toast();
+                                    toast.setText('Updated')
+                                        .show();
+                                }
+                            };
+                            xmlhttp.send("date=" + newdate + "&noon=" + na + "&night=" + nb + "&email=" + emailuser);
+                        });
+                        q.appendChild(savebutton);
+
+                    }
+                }
+            };
+            xmlhttp.send();
+        }
+    </script>
+{% endblock %}
+</body>

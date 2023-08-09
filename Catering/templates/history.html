@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+<head>
+    <title>{% block title %}History{% endblock %}</title>
+</head>
+<body>
+{% block body %}
+    <div id="mynav" class="historydiv mt-3">
+        <h2 class="historytitle">Attendance History</h2>
+        <ul id="thenav" class="nav mylist  nav-tabs">
+            {% for month in months %}
+                {% if month == current_month %}
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="">{{ month }}</a>
+                    </li>
+                {% endif %}
+                {% if month != current_month %}
+                    <li class="nav-item">
+                        <a class="nav-link " data-toggle="tab" href="">{{ month }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+        <div class="tab-content mt-3">
+            <div id="mytab" class="container tab-pane  active">
+                <table id="mytable">
+                    <tr class="historytableheader">
+                        <th class="cell">Date</th>
+                        <th class="cell">Afternoon</th>
+                        <th class="cell">Night</th>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        let month_name = new Date().toLocaleString('default', {month: 'long'});
+        showrecords(month_name);
+        let objects = document.getElementById("thenav").querySelectorAll(".nav-link");
+        for (i = 0; i < objects.length; i++) {
+            let a = objects[i].textContent;
+            objects[i].addEventListener("click", () => {
+                showrecords(a);
+
+            });
+        }
+
+        function showrecords(month) {
+            let xmlhttp;
+            if (window.XMLHttpRequest) {
+                xmlhttp = new XMLHttpRequest();
+            } else {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.open('GET', '/get-records/' + month + "/", true);
+            xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xmlhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    $('#mytable tr').slice(1).remove();
+                    let ans = JSON.parse(this.response);
+                    for (var i = 0; i < ans.length; i++) {
+                        let mytable = document.getElementById("mytable");
+                        let rows = mytable.rows.length;
+                        x = document.getElementById('mytable').insertRow(rows);
+                        var y = x.insertCell(0);
+                        var z = x.insertCell(1);
+                        var w = x.insertCell((2));
+                        y.className = "cell";
+                        z.className = "cell";
+                        w.className = "cell";
+                        let afternoon;
+                        let night;
+                        let aft = ans[i].attendance[0];
+                        let ngt = ans[i].attendance[1];
+                        if (aft == "1") {
+                            afternoon = "Present";
+                        } else {
+                            afternoon = "Absent";
+                            z.className = "danger_cell";
+                        }
+                        if (ngt == "1") {
+                            night = "Present";
+                        } else {
+                            night = "Absent";
+                            w.className = "danger_cell";
+
+                        }
+                        y.innerHTML = ans[i].date;
+                        z.innerHTML = afternoon;
+                        w.innerHTML = night;
+                    }
+                }
+            };
+            xmlhttp.send();
+        }
+
+        $('#nav_history').addClass("active");
+    </script>
+{% endblock %}
+</body>
